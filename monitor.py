@@ -25,7 +25,7 @@ while True:
         message['Subject'] = 'Subsonic is down'
         message['From'] = ''
         message['To'] = args.recipient
-        s = smtplib.SMTP('localhost', 25)
+        s = smtplib.SMTP('smtp', 25)
         s.send_message(message)
         s.quit()
 
