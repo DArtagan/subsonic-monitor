@@ -13,20 +13,21 @@ parser.add_argument('salt', type=str)
 parser.add_argument('recipient', type=str)
 args = parser.parse_args()
 
-while True:
-    try:
-        random = request.urlopen('http://{0}/rest/getRandomSongs?size=1&u={1}&t={2}&s={3}&v=1.13.0&c=monitor'.format(args.domain, args.username, args.token, args.salt)).read()
-        random = etree.fromstring(random)
-        random = random.find('.//{http://libresonic.org/restapi}song').attrib['id']
+def main():
+    while True:
+        try:
+            random = request.urlopen('http://{0}/rest/getRandomSongs?size=1&u={1}&t={2}&s={3}&v=1.13.0&c=monitor'.format(args.domain, args.username, args.token, args.salt)).read()
+            random = etree.fromstring(random)
+            random = random.find('.//{http://libresonic.org/restapi}song').attrib['id']
 
-        song = request.urlopen('http://{0}/rest/download?id={1}&u={2}&t={3}&s={4}&v=1.13.0&c=monitor'.format(args.domain, random, args.username, args.token, args.salt))
-    except error.HTTPError:
-        notify()
-    else:
-        if song.getheader('Content-Type') != 'application/x-download':
+            song = request.urlopen('http://{0}/rest/download?id={1}&u={2}&t={3}&s={4}&v=1.13.0&c=monitor'.format(args.domain, random, args.username, args.token, args.salt))
+        except error.HTTPError:
             notify()
+        else:
+            if song.getheader('Content-Type') != 'application/x-download':
+                notify()
 
-    time.sleep(3600)
+        time.sleep(3600)
 
 
 def notify():
@@ -38,3 +39,5 @@ def notify():
     s.send_message(message)
     s.quit()
 
+if __name__ == '__main__':
+    main()
